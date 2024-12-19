@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Customer Dashboard</title>
+{% endblock head %}
+
+{% block body %}
+<!-- Bootstrap Modal for Service Request Remark Form -->
+<div class="modal modal-sheet p-4 py-md-5" tabindex="-1" role="dialog" id="modalForm">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-header p-4 pb-4 border-bottom-0">
+                <h1 class="fw-bold mb-0 fs-2 w-100 text-center" id="modalFormTitle"></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-4 pt-0">
+                <form class="needs-validation" method="post" novalidate id="reviewForm">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-floating mb-3">
+                        {{ form.service }}
+                        {{ form.service.label }}
+                        <div id="floatingServiceFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.date_requested }}
+                        {{ form.date_requested.label }}
+                        <div id="floatingRequestedDateFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.date_accepted }}
+                        {{ form.date_accepted.label }}
+                        <div id="floatingAcceptedDateFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.professional }}
+                        {{ form.professional.label }}
+                        <div id="floatingProfessionalFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.remarks }}
+                        {{ form.remarks.label }}
+                        <div id="floatingRemarksFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="card mb-3 rating-field py-2" title="Bad : Work not done properly
+Poor : Work done but not satisfied with work
+Fair : Work done as expected
+Satisfied : Work done better, but there is room for improvement
+Good : Work done exceptionally well">
+                        {{ form.rating.label(class_="ms-2 mb-2") }}
+                        <div class="ms-3 justify-content-center">
+                            {% for subfield in form.rating %}
+                            <div class="form-check">
+                                {{ subfield(class_="form-check-input") }}
+                                {{ subfield.label(class_="form-check-label text-black") }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div id="floatingRatingFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div>
+                        {{ form.submit }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <div id="bookingContent">
+        <div class="card my-5 shadow-lg my-5 px-4 pt-4">
+            <h4 class="text-center card-container-title mb-4">Available Services</h4>
+            <div class="row">
+                {% for service in services %}
+                {% if service.is_available %}
+                <div class="col-sm-4 mb-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ service.name }}</h5>
+                            <p class="card-text">{{ service.description }}</p>
+                            <p class="card-text">₹ {{ service.price }} for {{ service.duration }} {{ service.period }}
+                            </p>
+                            <p class="card-text"></p>
+                            <form>
+                                <button class="btn btn-primary" type="button"
+                                    onclick='fetchServicePackage(parseInt("{{ service.id }}", 10))'>View
+                                    Packages</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            {% if not services %}
+            <div>
+                <h6 class="text-center">No services</h6>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="table-responsive card p-4 my-5 shadow-lg">
+        <table class="table caption-top align-middle table-hover mb-2">
+            <caption>
+                <h5>Service History</h5>
+            </caption>
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Service Name</th>
+                    <th scope="col">Service Professional's Name</th>
+                    <th scope="col">Service Professional's Phone Number</th>
+                    <th scope="col">Status of Service Request</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for service_request in service_history %}
+                <tr>
+                    <td>{{ service_request.id }}</td>
+                    <td>{{ service_request.service }}</td>
+                    <td>{{ service_request.professional }}</td>
+                    <td>{{ service_request.professional_phone }}</td>
+                    {% if service_request.status == 'accepted' %}
+                    <td>
+                        <form>
+                            <button class="btn btn-warning mb-1 mb-md-0 me-md-1" title="Close Service Request"
+                                type="button"
+                                onclick='openServiceRequestReviewForm(parseInt("{{ service_request.id }}", 10))'>Close</button>
+                        </form>
+                    </td>
+                    {% else %}
+                    <td>{{ service_request.status }}</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+                {% if not service_history %}
+                <tr>
+                    <td colspan="5">No service history</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock body %}
+{% block scripts %}
+<script>
+
+    async function openServiceRequestReviewForm(service_request_id) {
+        try {
+            const service_request_url = `{{ url_for('customer.close_service') }}?id=${service_request_id}`;
+            const response = await fetch(service_request_url);
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+
+            const modal = new bootstrap.Modal(document.getElementById('modalForm'));
+            const modalFormTitle = document.getElementById('modalFormTitle');
+            modalFormTitle.textContent = 'Review';
+            const reviewForm = document.getElementById('reviewForm');
+
+            reviewForm.action = service_request_url;
+            reviewForm.id.value = data.id;
+            reviewForm.service.value = data.service;
+            reviewForm.date_requested.value = data.date_requested;
+            reviewForm.date_accepted.value = data.date_accepted;
+            reviewForm.professional.value = data.professional;
+            modal.show();
+
+        } catch (error) {
+            console.error('ERROR: ', error);
+        }
+    }
+
+
+    async function fetchServicePackage(service_id) {
+        try {
+            const response = await fetch(`{{ url_for('customer.book_package') }}?id=${service_id}`);
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            displayPackages(data["packages"]);
+
+        } catch (error) {
+            console.log('ERROR:', error);
+        }
+    }
+
+    function displayPackages(packages) {
+        const bookingContent = document.getElementById('bookingContent');
+        bookingContent.innerHTML = `
+        <div class="table-responsive card p-4 my-5 shadow-lg">
+            <table class="table caption-top align-middle table-hover mb-2">
+                <caption>
+                    <h5>Available Packages</h5>
+                </caption>
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Experience (in Years)</th>
+                        <th scope="col">Average Rating (in 5)</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    ${packages.map(package => `
+                    <tr>
+                        <td>${package.id}</td>
+                        <td>${package.name}</td>
+                        <td>${package.description}</td>
+                        <td>${package.experience}</td>
+                        <td>
+                        ${package.tot_reviews === 0 ? 'Not Rated Yet' : package.avg_rating}
+                        </td>
+                        <td>
+                            <form>
+                                <button class="btn btn-primary" title="Book Package" type="submit" formmethod="post"
+                                    formaction="{{ url_for('customer.book_package') }}?id=${package.id}">Book</button>
+                            </form>
+                        </td>
+                    </tr>
+                    `).join('')}
+                    ${!packages.length ? `
+                    <tr>
+                        <td colspan="6">No Package Available</td>
+                    </tr>
+                    ` : ''}
+                </tbody>
+            </table>
+        </div>
+        `;
+    }
+
+
+    const forms = document.querySelectorAll('.needs-validation')
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated')
+        }, false)
+    });
+</script>
+{% endblock scripts %}

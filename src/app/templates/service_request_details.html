@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block head %}
+<title>Service Request Details</title>
+{% endblock head %}
+
+{% block body %}
+
+<div class="container mt-5">
+    <div class="table-responsive card p-4 my-5 shadow-lg">
+        <table class="table caption-top align-middle table-hover mb-2">
+            <caption>
+                <h5>Service Request Details</h5>
+            </caption>
+            <thead>
+                <tr>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="col" class="table-field">Service Request ID</th>
+                    <td scope="col">{{ service_request.id }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Customer</th>
+                    <td scope="col">{{ service_request.customer }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Assigned Service Professional</th>
+                    <td scope="col">{{ service_request.professional }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Service</th>
+                    <td scope="col">{{ service_request.service }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Date of Request</th>
+                    <td scope="col">{{ service_request.date_requested }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Date of Acceptence</th>
+                    <td scope="col">{{ service_request.date_accepted }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Date of Completion</th>
+                    <td scope="col">{{ service_request.date_completed }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Status</th>
+                    <td scope="col">{{ service_request.status }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Rating (in 5.0)</th>
+                    <td scope="col">{{ service_request.rating }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Review Comment</th>
+                    <td scope="col">{{ service_request.review_comment }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock body %}
+
+{% block scripts %}
+<script>
+
+</script>
+{% endblock scripts %}

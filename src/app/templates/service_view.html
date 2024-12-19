@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>View Service Requests</title>
+{% endblock head %}
+
+{% block body %}
+
+<div class="container">
+    <div class="table-responsive card p-4 my-5 shadow-lg">
+        <table class="table caption-top align-middle table-hover mb-2">
+            <caption>
+                <h5>Service Requests for {{ service }}</h5>
+            </caption>
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Customer</th>
+                    <th scope="col">Professional</th>
+                    <th scope="col">Date Requested</th>
+                    <th scope="col">Date Accepted</th>
+                    <th scope="col">Date Completed</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Rating</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for service_request in service_requests %}
+                <tr>
+                    <td>{{ service_request.id }}</td>
+                    <td>{{ service_request.customer }}</td>
+                    <td>{{ service_request.professional }}</td>
+                    <td>{{ service_request.date_requested }}</td>
+                    <td>{{ service_request.date_accepted }}</td>
+                    <td>{{ service_request.date_completed }}</td>
+                    <td>{{ service_request.status }}</td>
+                    <td>{{ service_request.rating }}</td>
+                </tr>
+                {% endfor %}
+                {% if not service_requests %}
+                <tr>
+                    <td colspan="8" class="text-center">No Service Requests Found</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock body%}

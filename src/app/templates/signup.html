@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Sign up</title>
+{% endblock head %}
+
+{% block body %}
+
+<div class="container d-flex justify-content-center">
+    <div class="card auth-form-card my-5 shadow-lg">
+        <div class="card-header mb-3 text-center">
+            <h3 class="my-4 fw-bold">
+                {% if user == 'customer' %}
+                Customer Sign up
+                {% elif user == 'professional' %}
+                Service Professional Sign up
+                {% elif user == 'admin' %}
+                Admin Sign up
+                {% endif %}
+            </h3>
+            {% if user == 'customer' %}
+            Are you a Service Professional? <strong><a href="{{ url_for('auth.signup_professional') }}">Register
+                    Now</a></strong>
+            {% elif user == 'professional' %}
+            Are you a Customer? <strong><a href="{{ url_for('auth.signup_customer') }}">Register Now</a></strong>
+            {% endif %}
+        </div>
+
+        <div class="card-body px-5">
+            <form class="needs-validation" method="post" novalidate>
+                {{ form.hidden_tag() }}
+
+                <div class="form-floating mb-3">
+                    {{ form.email }}
+                    {{ form.email.label }}
+                    <div id="floatingEmailFeedback" class="invalid-feedback m-0">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <div class="form-floating">
+                            {{ form.password }}
+                            {{ form.password.label }}
+                        </div>
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword"><i class="bi bi-eye"
+                                id="passwordEyeIcon"></i></button>
+                    </div>
+                    <div id="floatingPasswordFeedback" class="invalid-feedback m-0"></div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <div class="form-floating">
+                            {{ form.confirm_password }}
+                            {{ form.confirm_password.label }}
+                        </div>
+                        <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword"><i
+                                class="bi bi-eye" id="confirmPasswordEyeIcon"></i></button>
+                    </div>
+                    <div id="floatingConfirmPasswordFeedback" class="invalid-feedback m-0"></div>
+                </div>
+
+
+                <div class="form-floating mb-3">
+                    {{ form.name }}
+                    {{ form.name.label }}
+                    <div id="floatingNameFeedback" class="invalid-feedback m-0"></div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <div class="form-floating">
+                            {{ form.phone }}
+                            {{ form.phone.label }}
+                        </div>
+                    </div>
+                    <div id="floatingPhoneFeedback" class="invalid-feedback m-0"></div>
+                </div>
+
+                <div class="form-floating mb-3">
+                    {{ form.address }}
+                    {{ form.address.label }}
+                    <div id="floatingAddressFeedback" class="invalid-feedback m-0"></div>
+                </div>
+
+                <div class="form-floating mb-3">
+                    {{ form.pincode }}
+                    {{ form.pincode.label }}
+                    <div id="floatingPincodeFeedback" class="invalid-feedback m-0"></div>
+                </div>
+
+
+                {% if user == 'professional' %}
+
+                <div class="form-floating mb-3">
+                    {{ form.experience }}
+                    {{ form.experience.label }}
+                    <div id="floatingExperienceFeedback" class="invalid-feedback m-0"></div>
+                </div>
+
+                <div class="form-floating mb-3">
+                    {{ form.service }}
+                    {{ form.service.label }}
+                    <div id="floatingServiceFeedback" class="invalid-feedback m-0"></div>
+                </div>
+
+                <div class="form-floating mb-3">
+                    {{ form.description }}
+                    {{ form.description.label }}
+                    <div id="floatingDescriptionFeedback" class="invalid-feedback"></div>
+                </div>
+
+                {% endif %}
+
+                <div class="mt-5">
+                    {{ form.submit }}
+                </div>
+
+            </form>
+        </div>
+
+        <div class="card-footer text-center mt-3 p-3">
+            Already have an account? <strong><a href="{{ url_for('auth.login') }}">Login Now</a></strong>
+        </div>
+    </div>
+
+    {% endblock body%}
+    {% block scripts %}
+    <script>
+        // Frontend Form Validation
+        function validateEmail(form) {
+            const emailField = form.querySelector('#floatingEmail');
+            const emailFeedback = form.querySelector('#floatingEmailFeedback');
+
+            const email = emailField.value;
+            const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
+            if (!emailPattern.test(email)) {
+                emailFeedback.style.display = "block";
+                emailField.setCustomValidity("Validation Failed");
+                emailFeedback.textContent = "Invalid Email Address!";
+                return;
+            }
+
+            emailFeedback.style.display = "none";
+            emailField.setCustomValidity("");
+        }
+
+
+        function validateConfirmPassword(form) {
+            const passwordField = form.querySelector('#floatingPassword');
+            const confirmPasswordField = form.querySelector('#floatingConfirmPassword');
+            const confirmPasswordFeedback = form.querySelector('#floatingConfirmPasswordFeedback');
+            const password = passwordField.value;
+            const confirmPassword = confirmPasswordField.value;
+
+            if (password !== confirmPassword) {
+                confirmPasswordFeedback.style.display = "block";
+                confirmPasswordFeedback.textContent = "Passwords do not match!";
+                confirmPasswordField.setCustomValidity("Validation Failed");
+                return;
+            }
+
+            confirmPasswordFeedback.style.display = "none";
+            confirmPasswordField.setCustomValidity("");
+        }
+
+
+        function validatePasswordComplexity(form) {
+            const passwordField = form.querySelector('#floatingPassword');
+            const passwordFeedback = form.querySelector('#floatingPasswordFeedback');
+            const password = passwordField.value;
+
+            const minLength = 8;
+            const maxLength = 16;
+            const numberCheck = /[0-9]/;
+            const uppercaseCheck = /[A-Z]/;
+            const lowercaseCheck = /[a-z]/;
+
+            if (password.length < minLength || password.length > maxLength) {
+                passwordFeedback.style.display = "block";
+                passwordFeedback.textContent = `Password must be between ${minLength} and ${maxLength} characters!`;
+                passwordField.setCustomValidity("Validation Failed");
+                return;
+            }
+            else if (!numberCheck.test(password)) {
+                passwordFeedback.style.display = "block";
+                passwordFeedback.textContent = "Password must contain at least one number!";
+                passwordField.setCustomValidity("Validation Failed");
+                return;
+            }
+            else if (!uppercaseCheck.test(password)) {
+                passwordFeedback.style.display = "block";
+                passwordFeedback.textContent = "Password must contain at least one uppercase letter!";
+                passwordField.setCustomValidity("Validation Failed");
+                return;
+            }
+            else if (!lowercaseCheck.test(password)) {
+                passwordFeedback.style.display = "block";
+                passwordFeedback.textContent = "Password must contain at least one lowercase letter!";
+                passwordField.setCustomValidity("Validation Failed");
+                return;
+            }
+
+            passwordFeedback.style.display = "none";
+            passwordField.setCustomValidity("");
+        }
+
+
+        function validatePhone(form) {
+            const phoneField = form.querySelector('#floatingPhone');
+            const phoneFeedback = form.querySelector('#floatingPhoneFeedback');
+            const phone = phoneField.value;
+
+            const phonePattern = /^\d{10}$/;
+
+            if (!phonePattern.test(phone)) {
+                phoneFeedback.style.display = "block";
+                phoneFeedback.textContent = "Phone Number must be 10 digits!";
+                phoneField.setCustomValidity("Validation Failed");
+                return;
+            }
+
+            phoneFeedback.style.display = "none";
+            phoneField.setCustomValidity("");
+        }
+
+
+        function validatePincode(form) {
+            const pincodeField = form.querySelector('#floatingPincode');
+            const pincodeFeedback = form.querySelector('#floatingPincodeFeedback');
+            const pincode = pincodeField.value;
+
+            const pincodePattern = /^\d{6}$/;
+
+            if (!pincodePattern.test(pincode)) {
+                pincodeFeedback.style.display = "block";
+                pincodeFeedback.textContent = "Pin Code must be 6 digits!";
+                pincodeField.setCustomValidity("Validation Failed");
+                return;
+            }
+
+            pincodeFeedback.style.display = "none";
+            pincodeField.setCustomValidity("");
+        }
+
+
+        function validateExperience(form) {
+            const experienceField = form.querySelector('#floatingExperience');
+            const experienceFeedback = form.querySelector('#floatingExperienceFeedback');
+            const experience = experienceField.value;
+
+            const experiencePattern = /^\d{1,2}$/;
+
+            if (!experiencePattern.test(experience)) {
+                experienceFeedback.style.display = "block";
+                experienceFeedback.textContent = "Experience must be atmost 2 digits!";
+                experienceField.setCustomValidity("Validation Failed");
+                return;
+            }
+
+            experienceFeedback.style.display = "none";
+            experienceField.setCustomValidity("");
+        }
+
+        const forms = document.querySelectorAll('.needs-validation')
+        Array.from(forms).forEach(form => {
+
+
+            const togglePasswordButton = document.getElementById('togglePassword');
+            const passwordField = document.getElementById('floatingPassword');
+            if (passwordField.type === 'text') {
+                togglePasswordButton.click();
+            }
+
+            const toggleConfirmPasswordButton = document.getElementById('toggleConfirmPassword');
+            const confirmPasswordField = document.getElementById('floatingConfirmPassword');
+            if (confirmPasswordField.type === 'text') {
+                toggleConfirmPasswordButton.click();
+            }
+
+            const user = `{{ user }}`;
+
+            form.addEventListener('submit', event => {
+                validateEmail(form);
+                validatePasswordComplexity(form);
+                validateConfirmPassword(form);
+                validatePhone(form);
+                validatePincode(form);
+
+                if (user === 'professional') {
+                    validateExperience(form);
+                }
+
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated')
+            }, false)
+        });
+
+
+
+
+        // Password & Confirm Password Visibility Toggle
+        document.getElementById('togglePassword').addEventListener('click', () => {
+            const passwordField = document.getElementById('floatingPassword');
+            const eyeIcon = document.getElementById('passwordEyeIcon');
+
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+
+            eyeIcon.classList.toggle('bi-eye');
+            eyeIcon.classList.toggle('bi-eye-slash');
+        });
+
+        document.getElementById('toggleConfirmPassword').addEventListener('click', () => {
+            const passwordField = document.getElementById('floatingConfirmPassword');
+            const eyeIcon = document.getElementById('confirmPasswordEyeIcon');
+
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+
+            eyeIcon.classList.toggle('bi-eye');
+            eyeIcon.classList.toggle('bi-eye-slash');
+        });
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const messages = [];
+            // {% for field, errors in form.errors.items() %}
+            // {% for error in errors %}
+            messages.push(`{{ field }}: {{ error }}`)
+            // {% endfor %}
+            // {% endfor %}
+            if (messages.length > 0) {
+                messages.forEach(message => {
+                    showToast(message);
+                });
+            }
+
+            const main = document.querySelector('main');
+            main.classList.add('bg-secondary');
+        });
+
+    </script>
+    {% endblock scripts %}

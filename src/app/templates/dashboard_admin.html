@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Admin Dashboard</title>
+{% endblock head %}
+
+{% block body %}
+<!-- Bootstrap Modal for Service Create & Edit -->
+<div class="modal modal-sheet p-4 py-md-5" tabindex="-1" role="dialog" id="modalForm">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-header p-4 pb-4 border-bottom-0">
+                <h4 class="fw-bold mb-0 fs-2 w-100 text-center" id="modalFormTitle"></h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-4 pt-0">
+                <form class="needs-validation" method="post" novalidate id="modalFormForm">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-floating mb-3">
+                        {{ form.name }}
+                        {{ form.name.label }}
+                        <div id="floatingNameFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.price }}
+                        {{ form.price.label }}
+                        <div id="floatingPriceFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.duration }}
+                        {{ form.duration.label }}
+                        <div id="floatingDurationFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.period }}
+                        {{ form.period.label }}
+                        <div id="floatingDurationPeriodFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.description }}
+                        {{ form.description.label }}
+                        <div id="floatingDescriptionFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div>
+                        {{ form.submit }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Dashboard Content -->
+<div class="container">
+    <div class="table-responsive card p-4 my-5 shadow-lg">
+        <table class="table caption-top align-middle table-hover mb-2">
+            <caption>
+                <h5>Services</h5>
+            </caption>
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Price (in ₹)</th>
+                    <th scope="col">Completion Time</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for service in services %}
+                <tr>
+                    <th scope="row">
+                        <a href="{{ url_for('admin.view_service', service_id=service.id) }}"
+                            title="Click to view service requests of this service">{{ service.id }}</a>
+                    </th>
+                    <td>{{ service.name }}</td>
+                    <td>{{ service.base_price }}</td>
+                    <td>{{ service.completion_time }}</td>
+                    <td>{{ service.description }}</td>
+                    <td>
+                        <form>
+                            <button class="btn btn-primary mb-1 mb-md-0 me-md-1" title="Edit Service" type="button"
+                                onclick='openServiceEditForm(parseInt("{{ service.id }}", 10))'><i
+                                    class="bi bi-pencil-fill"></i></button>
+                            <button class="btn btn-danger" title="Delete Service" type="button"
+                                onclick='deleteService(parseInt("{{ service.id }}", 10))'><i
+                                    class="bi bi-trash3-fill"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if not services %}
+                <tr>
+                    <td colspan="6" class="text-center">No services</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td colspan="6">
+                        <div>
+                            <button class="btn btn-success" title="New Service" type="button" id="createService">New
+                                Service</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-responsive card p-4 my-5 shadow-lg">
+        <table class="table caption-top align-middle table-hover mb-2">
+            <caption>
+                <h5>Professionals</h5>
+            </caption>
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Experience (in Years)</th>
+                    <th scope="col">Service Name</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for professional in professionals %}
+                <tr>
+                    <th scope="row">
+                        <a href="{{ url_for('admin.get_user_details', id=professional.id) }}"
+                            title="Click to view Service Professional's Details">{{ professional.id }}</a>
+                    </th>
+                    <td>{{ professional.name }}</td>
+                    <td>{{ professional.experience }}</td>
+                    <td>{{ professional.service }}</td>
+                    <td>{{ professional.status }}</td>
+                    <td>
+                        <form>
+                            {% if professional.approval == 'approved' %}
+                            <button class="btn btn-danger" title="Reject Service Professional" type="submit"
+                                formmethod="post"
+                                formaction="{{ url_for('admin.reject_professional', professional_id=professional.id) }}"><i
+                                    class="bi bi bi-x-circle-fill"></i></button>
+                            {% elif professional.approval == 'rejected' %}
+                            <button class="btn btn-success mb-1 mb-md-0 me-md-1" title="Approve Service Professional"
+                                type="submit" formmethod="post"
+                                formaction="{{ url_for('admin.approve_professional', professional_id=professional.id) }}"><i
+                                    class="bi bi-check-circle-fill"></i></button>
+                            {% else %}
+                            <button class="btn btn-success mb-1 mb-md-0 me-md-1" title="Approve Service Professional"
+                                type="submit" formmethod="post"
+                                formaction="{{ url_for('admin.approve_professional', professional_id=professional.id) }}"><i
+                                    class="bi bi-check-circle-fill"></i></button>
+                            <button class="btn btn-danger" title="Reject Service Professional" type="submit"
+                                formmethod="post"
+                                formaction="{{ url_for('admin.reject_professional', professional_id=professional.id) }}"><i
+                                    class="bi bi bi-x-circle-fill"></i></button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if not professionals %}
+                <tr>
+                    <td colspan="6" class="text-center">
+                        No Service Professional have Registered
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-responsive card p-4 my-5 shadow-lg">
+        <table class="table caption-top align-middle table-hover mb-2">
+            <caption>
+                <h5>Service Requests</h5>
+            </caption>
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Assigned Professional Name</th>
+                    <th scope="col">Customer Name</th>
+                    <th scope="col">Service Name</th>
+                    <th scope="col">Requested Date</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for service_request in service_requests %}
+                <tr>
+                    <th scope="row">{{ service_request.id }}</th>
+                    <td>{{ service_request.professional }}</td>
+                    <td>{{ service_request.customer }}</td>
+                    <td>{{ service_request.service }}</td>
+                    <td>{{ service_request.date_requested }}</td>
+                    <td>{{ service_request.status }}</td>
+                </tr>
+                {% endfor %}
+                {% if not service_requests %}
+                <tr>
+                    <td colspan="6" class="text-center">
+                        No Service Requests
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock body %}
+{% block scripts %}
+<script>
+
+    const createService = document.getElementById('createService');
+    createService.addEventListener('click', function () {
+        const modal = new bootstrap.Modal(document.getElementById('modalForm'), {});
+        const modalFormTitle = document.getElementById('modalFormTitle');
+        modalFormTitle.textContent = 'New Service';
+        const modalFormForm = document.getElementById('modalFormForm');
+        modalFormForm.action = "{{ url_for('admin.create_service') }}";
+        modal.show();
+    });
+
+    async function openServiceEditForm(service_id) {
+        try {
+            const response = await fetch("{{ url_for('admin.edit_service') }}?id=" + service_id);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+
+            // If the response is a success, open the modal other wise show an error message
+            if (data["status"] === "error") {
+                alert(data["message"]);
+                return;
+            }
+            else if (data["status"] === "success") {
+                // Populate the form fields with the received data
+                const modal = new bootstrap.Modal(document.getElementById('modalForm'), {});
+                const modalFormTitle = document.getElementById('modalFormTitle');
+                modalFormTitle.textContent = 'Edit Service';
+                const modalFormForm = document.getElementById('modalFormForm');
+
+                modalFormForm.action = "{{ url_for('admin.edit_service') }}" + "?id=" + service_id;
+                modalFormForm.id.value = data.id;
+                modalFormForm.name.value = data.name;
+                modalFormForm.price.value = data.price;
+                modalFormForm.duration.value = data.duration;
+                modalFormForm.period.value = data.period;
+                modalFormForm.description.value = data.description;
+                modalFormForm.submit.value = 'Update';
+                modal.show();
+            }
+        } catch (error) {
+            console.log('ERROR:', error);
+        }
+    }
+
+    function deleteService(service_id) {
+        showModal('Are you sure you?', 'This action cannot be undone.', 'Delete Service', 'Cancel', async () => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalChoice'));
+            modal.hide();
+
+            const jsonData = {
+                id: service_id
+            }
+
+            const url = "{{ url_for('admin.delete_service_check') }}";
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonData)
+                })
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+
+                //
+                if (data["can_delete"]) {
+                    const deleteUrl = "{{ url_for('admin.delete_service') }}";
+                    const deleteResponse = await fetch(deleteUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(jsonData)
+                    })
+                    if (!deleteResponse.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    window.location.href = deleteResponse.url;
+                }
+                else {
+                    alert(data["message"]);
+                }
+            }
+            catch (error) {
+                console.error('ERROR:', error);
+            }
+        });
+    }
+
+    function validatePrice(form) {
+        const priceField = form.querySelector('#floatingPrice');
+        const priceFeedback = form.querySelector('#floatingPriceFeedback');
+
+        const price = priceField.value;
+        const pricePattern = /^\d{0,8}(\.\d{1,2})?$/;
+
+        if (!pricePattern.test(price)) {
+            priceFeedback.style.display = "block";
+            priceFeedback.textContent = "Price must be a number with upto 2 decimal places";
+            priceField.setCustomValidity("Validation Failed");
+            return;
+        }
+        priceFeedback.style.display = "none";
+        priceField.setCustomValidity("");
+    }
+
+    function validateDuration(form) {
+        const durationField = form.querySelector('#floatingDuration');
+        const durationFeedback = form.querySelector('#floatingDurationFeedback');
+
+        const duration = durationField.value;
+        const durationPattern = /^\d+$/;
+
+        if (!durationPattern.test(duration)) {
+            durationFeedback.style.display = "block";
+            durationFeedback.textContent = "Duration must be a number without fractional part";
+            durationField.setCustomValidity("Validation Failed");
+            return;
+        }
+        durationFeedback.style.display = "none";
+        durationField.setCustomValidity("");
+    }
+
+    const forms = document.querySelectorAll('.needs-validation')
+    Array.from(forms).forEach(form => {
+
+        form.addEventListener('submit', event => {
+            validatePrice(form);
+            validateDuration(form);
+
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated')
+        }, false)
+    });
+
+</script>
+{% endblock scripts %}

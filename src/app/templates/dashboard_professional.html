@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Professional Dashboard</title>
+{% endblock head %}
+
+{% block body %}
+
+<div class="container">
+    <div class="table-responsive card p-4 my-5 shadow-lg">
+        <table class="table caption-top align-middle table-hover mb-2">
+            <caption>
+                <h5>Open Service Requests</h5>
+            </caption>
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Customer Name</th>
+                    <th scope="col">Phone Number</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">Pincode</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for open_service_request in open_service_requests %}
+                <tr>
+                    <td>{{ open_service_request.id }}</td>
+                    <td>{{ open_service_request.customer }}</td>
+                    <td>{{ open_service_request.phone }}</td>
+                    <td>{{ open_service_request.address }}</td>
+                    <td>{{ open_service_request.pincode }}</td>
+                    <td>
+                        <form>
+                            <button class="btn btn-success mb-1 mb-md-0 me-md-1" title="Accept Service Request"
+                                type="submit" formmethod="post"
+                                formaction="{{ url_for('professional.accept_service_request', service_request_id=open_service_request.id) }}"><i
+                                    class="bi bi-hand-thumbs-up-fill"></i></button>
+
+                            <button class="btn btn-danger" title="Reject Service Request" type="submit"
+                                formmethod="post"
+                                formaction="{{ url_for('professional.reject_service_request', service_request_id=open_service_request.id) }}"><i
+                                    class="bi bi-hand-thumbs-down-fill"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if not open_service_requests %}
+                <tr>
+                    <td colspan="6" class="text-center">No service requests</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-responsive card p-4 my-5 shadow-lg">
+        <table class="table caption-top align-middle table-hover mb-2">
+            <caption>
+                <h5>Accepted Service Requests</h5>
+            </caption>
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Customer Name</th>
+                    <th scope="col">Phone Number</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">Pincode</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for accepted_service_request in accepted_service_requests %}
+                <tr>
+                    <td>{{ accepted_service_request.id }}</td>
+                    <td>{{ accepted_service_request.customer }}</td>
+                    <td>{{ accepted_service_request.phone }}</td>
+                    <td>{{ accepted_service_request.address }}</td>
+                    <td>{{ accepted_service_request.pincode }}</td>
+                </tr>
+                {% endfor %}
+                {% if not accepted_service_requests %}
+                <tr>
+                    <td colspan="6" class="text-center">No service requests</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-responsive card p-4 my-5 shadow-lg">
+        <table class="table caption-top align-middle table-hover mb-2">
+            <caption>
+                <h5>Completed Service Requests</h5>
+            </caption>
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Customer Name</th>
+                    <th scope="col">Phone Number</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">Pincode</th>
+                    <th scope="col">Rating (in 5)</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for closed_service_request in closed_service_requests %}
+                <tr>
+                    <td>{{ closed_service_request.id }}</td>
+                    <td>{{ closed_service_request.customer }}</td>
+                    <td>{{ closed_service_request.phone }}</td>
+                    <td>{{ closed_service_request.address }}</td>
+                    <td>{{ closed_service_request.pincode }}</td>
+                    <td>{{ closed_service_request.rating }}</td>
+                </tr>
+                {% endfor %}
+                {% if not closed_service_requests %}
+                <tr>
+                    <td colspan="6" class="text-center">No service requests</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock body %}

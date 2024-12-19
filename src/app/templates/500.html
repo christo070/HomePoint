@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Internal Server Error{% endblock %}
+
+
+{% block body %}
+<div class="container mt-5">
+  <div class="alert alert-danger" role="alert">
+    <h4 class="alert-heading">Error 500: Internal Server Error</h4>
+    <p>Oops... we seem to have made a mistake, sorry!</p>
+    <p>Our team has been notified and will fix it as soon as possible.</p>
+    <p>Meanwhile, you can try to refresh the page or go back to the previous page.</p>
+    <hr>
+    <p class="mb-0">
+      <a href="{{ url_for('main.index') }}">Go to Home Page</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

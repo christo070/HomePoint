@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% block head %}
+<title>User Details</title>
+{% endblock head %}
+
+{% block body %}
+
+<div class="container mt-5">
+    <div class="table-responsive card p-4 my-5 shadow-lg">
+        <table class="table caption-top align-middle table-hover mb-2">
+            <caption>
+                <h5>User Details</h5>
+            </caption>
+            <thead>
+                <tr>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="col" class="table-field">Name</th>
+                    <td scope="col">{{ user.name }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Email</th>
+                    <td scope="col">{{ user.email }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Phone</th>
+                    <td scope="col">{{ user.phone }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Address</th>
+                    <td scope="col">{{ user.address }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Pincode</th>
+                    <td scope="col">{{ user.pincode }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Role</th>
+                    <td scope="col">{{ user.role }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Date Created</th>
+                    <td scope="col">{{ user.date_created }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Account Status</th>
+                    <td scope="col">{{ user.status }}</td>
+                </tr>
+                {% if user.role == 'Professional' %}
+                <tr>
+                    <th scope="col" class="table-field">Experience (in Years)</th>
+                    <td scope="col">{{ user.experience }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Service</th>
+                    <td scope="col">{{ user.service }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Description</th>
+                    <td scope="col">{{ user.description }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Approval Status</th>
+                    <td scope="col">{{ user.approval }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Average Rating (in 5)</th>
+                    <td scope="col">{{ user.avg_rating }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-field">Total Number of Ratings</th>
+                    <td scope="col">{{ user.tot_reviews }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th scope="col" class="table-field">Action</th>
+                    <td scope="col">
+                        <form>
+                            {% if user.is_blocked == True %}
+                            <button class="btn btn-success" title="Un-Block User" type="button"
+                                onclick='unBlockUser(parseInt("{{ user.id }}", 10))'>Unblock</button>
+                            {% elif user.is_blocked == False %}
+                        <button class="btn btn-danger mb-1 mb-md-0 me-md-1" title="Block User" type="button"
+                            onclick='blockUser(parseInt("{{ user.id }}", 10))'>Block</button>
+                            {% endif %}
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-responsive card p-4 my-5 shadow-lg">
+        <table class="table table-striped caption-top align-middle table-hover mb-2">
+            <caption>
+                <h5>Reviews</h5>
+            </caption>
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    {% if user.role == 'Professional' %}
+                    <th scope="col">Customer</th>
+                    {% elif user.role == 'Customer' %}
+                    <th scope="col">Professional</th>
+                    {% endif %}
+                    <th scope="col">Date</th>
+                    <th scope="col">Request ID</th>
+                    <th scope="col">Rating (in 5)</th>
+                    <th scope="col">Comment</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                {% for review in reviews %}
+                <tr>
+                    <td>{{ review.id }}</td>
+                    {% if user.role == 'Professional' %}
+                    <td>{{ review.customer }}</td>
+                    {% elif user.role == 'Customer' %}
+                    <td>{{ review.professional }}</td>
+                    {% endif %}
+
+                    <td>{{ review.date }}</td>
+                    <td>{{ review.request_id }}</td>
+                    <td>{{ review.rating }}</td>
+                    <td>{{ review.comment }}</td>
+                </tr>
+                {% endfor %}
+                {% if not reviews %}
+                <tr>
+                    <td colspan="6" class="text-center">No reviews</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock body %}
+{% block scripts %}
+<script>
+    async function blockUser(id) {
+        try {
+            const response = await fetch(`{{ url_for('admin.block_user') }}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'id': id
+                })
+
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            window.location.reload();
+        }
+        catch (error) {
+            console.error('ERROR: ', error);
+        }
+    }
+
+    async function unBlockUser(id) {
+        try {
+            const response = await fetch(`{{ url_for('admin.unblock_user') }}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'id': id
+                })
+
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            window.location.reload();
+        }
+        catch (error) {
+            console.error('ERROR: ', error);
+        }
+    }
+</script>
+{% endblock scripts %}

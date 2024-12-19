@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>View Profile</title>
+{% endblock head %}
+
+{% block body %}
+<!-- Bootstrap Modal for Profile Edit -->
+<div class="modal modal-sheet p-4 py-md-5" tabindex="-1" role="dialog" id="modalForm">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-4 shadow">
+            <div class="modal-header p-4 pb-4 border-bottom-0">
+                <h1 class="fw-bold mb-0 fs-2 text-center w-100" id="modalFormTitle">Edit Profile</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-4 pt-0">
+                <form class="needs-validation" method="post" novalidate id="modalFormForm">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-floating mb-3">
+                        {{ form.email }}
+                        {{ form.email.label }}
+                        <div id="floatingEmailFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.name }}
+                        {{ form.name.label }}
+                        <div id="floatingNameFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.phone }}
+                        {{ form.phone.label }}
+                        <div id="floatingPhoneFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.address }}
+                        {{ form.address.label }}
+                        <div id="floatingAddressFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.pincode }}
+                        {{ form.pincode.label }}
+                        <div id="floatingPincodeFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    {% if user.role == 'professional' %}
+
+                    <div class="form-floating mb-3">
+                        {{ form.experience }}
+                        {{ form.experience.label }}
+                        <div id="floatingExperienceFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.service }}
+                        {{ form.service.label }}
+                        <div id="floatingServiceFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.description }}
+                        {{ form.description.label }}
+                        <div id="floatingDescriptionFeedback" class="invalid-feedback"></div>
+                    </div>
+
+                    {% endif %}
+
+                    <div>
+                        {{ form.submit }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container my-5">
+    <div class="row border rounded mx-3 d-flex justify-content-center shadow-lg">
+        <div class="card border-0 profile-section1 my-4 py-3 col-md">
+            <div class="d-flex justify-content-center px-3">
+                <img src="{{ url_for('static', filename='img/person.svg') }}" alt="Profile Avatar" height="100"
+                    width="100" class="profile-avatar">
+            </div>
+            <div class="card-body pb-0">
+                <h5 class="card-title text-center">{{ user.name }}</h5>
+                <p class="card-text text-center">{{ user.role.capitalize() }}</p>
+                <div class="d-flex justify-content-between mt-4">
+                    <form class="w-100">
+                        <button type="button" class="btn btn-warning w-100 mb-2" onclick="openProfileEditForm()">Edit
+                            Profile</button>
+                        <button type="button" class="btn btn-danger w-100 mb-0" onclick="confirmDelete()">Delete
+                            Profile</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card border-0 table-responsive p-4 my-4 col-md">
+            <table class="table table-hover align-middle mb-2 table-borderless">
+                <thead>
+                </thead>
+                <tbody>
+                    <tr scope="row">
+                        <th scope="col">Email</th>
+                        <td scope="col">{{ user.email }}</td>
+                    </tr>
+                    <tr scope="row">
+                        <th scope="col">Phone</th>
+                        <td scope="col">{{ user.phone }}</td>
+                    </tr>
+                    <tr scope="row">
+                        <th scope="col">Address</th>
+                        <td scope="col">{{ user.address }}</td>
+                    </tr>
+                    <tr scope="row">
+                        <th scope="col">Pincode</th>
+                        <td scope="col">{{ user.pincode }}</td>
+                    </tr>
+                    {% if user.role == 'professional' %}
+                    <tr scope="row">
+                        <th scope="col">Experience (in Years)</th>
+                        <td scope="col">{{ user.experience }}</td>
+                    </tr>
+                    <tr scope="row">
+                        <th scope="col">Service</th>
+                        <td scope="col">{{ user.service }}</td>
+                    </tr>
+                    <tr scope="row">
+                        <th scope="col">Description</th>
+                        <td scope="col">{{ user.description }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="col">Average Rating (in 5)</th>
+                        <td scope="col">{{ user.rating }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="col">Service Requests Handled</th>
+                        <td scope="col">{{ user.tot_reviews }}</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock body%}
+{% block scripts %}
+<script>
+
+    function validateEmail(form) {
+        const emailField = form.querySelector('#floatingEmail');
+        const emailFeedback = form.querySelector('#floatingEmailFeedback');
+        const email = emailField.value;
+
+        const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
+        if (!emailPattern.test(email)) {
+            emailFeedback.style.display = "block";
+            emailField.setCustomValidity("Validation Failed");
+            emailFeedback.textContent = "Invalid Email Address!";
+            return;
+        }
+
+        emailFeedback.style.display = "none";
+        emailField.setCustomValidity("");
+    }
+
+
+    function validatePhone(form) {
+        const phoneField = form.querySelector('#floatingPhone');
+        const phoneFeedback = form.querySelector('#floatingPhoneFeedback');
+        const phone = phoneField.value;
+
+        const phonePattern = /^\d{10}$/;
+
+        if (!phonePattern.test(phone)) {
+            phoneFeedback.style.display = "block";
+            phoneFeedback.textContent = "Phone Number must be 10 digits!";
+            phoneField.setCustomValidity("Validation Failed");
+            return;
+        }
+
+        phoneFeedback.style.display = "none";
+        phoneField.setCustomValidity("");
+    }
+
+
+    function validatePincode(form) {
+        const pincodeField = form.querySelector('#floatingPincode');
+        const pincodeFeedback = form.querySelector('#floatingPincodeFeedback');
+        const pincode = pincodeField.value;
+
+        const pincodePattern = /^\d{6}$/;
+
+        if (!pincodePattern.test(pincode)) {
+            pincodeFeedback.style.display = "block";
+            pincodeFeedback.textContent = "Pin Code must be 6 digits!";
+            pincodeField.setCustomValidity("Validation Failed");
+            return;
+        }
+
+        pincodeFeedback.style.display = "none";
+        pincodeField.setCustomValidity("");
+    }
+
+
+    function validateExperience(form) {
+        const experienceField = form.querySelector('#floatingExperience');
+        const experienceFeedback = form.querySelector('#floatingExperienceFeedback');
+        const experience = experienceField.value;
+
+        const experiencePattern = /^\d{1,2}$/;
+
+        if (!experiencePattern.test(experience)) {
+            experienceFeedback.style.display = "block";
+            experienceFeedback.textContent = "Experience must be atmost 2 digits!";
+            experienceField.setCustomValidity("Validation Failed");
+            return;
+        }
+
+        experienceFeedback.style.display = "none";
+        experienceField.setCustomValidity("");
+    }
+
+    const forms = document.querySelectorAll('.needs-validation')
+    Array.from(forms).forEach(form => {
+        const user = `{{ user.role }}`;
+
+        form.addEventListener('submit', event => {
+            validateEmail(form);
+            validatePhone(form);
+            validatePincode(form);
+
+            if (user === 'professional') {
+                validateExperience(form);
+            }
+
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated')
+        }, false)
+    });
+
+
+    function openProfileEditForm() {
+        const modal = new bootstrap.Modal(document.getElementById('modalForm'), {});
+        modal.show();
+    };
+
+    function confirmDelete(user_id) {
+        showModal('Are you sure you?', 'This action cannot be undone.', 'Delete Profile', 'Cancel', async () => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalChoice'));
+            modal.hide();
+
+            const url = "/user/profile/delete";
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                window.location.href = response.url;
+            }
+            catch (error) {
+                console.error('ERROR:', error);
+            }
+        });
+    };
+</script>
+{% endblock scripts %}

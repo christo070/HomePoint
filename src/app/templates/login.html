@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Login</title>
+{% endblock head %}
+
+{% block body %}
+
+<div class="container my-5 d-flex justify-content-center">
+    <div class="card auth-form-card shadow-lg">
+
+        <div class="card-header mb-3 text-center">
+            <h3 class="my-4 fw-bold">
+                Login
+            </h3>
+        </div>
+
+        <div class="card-body px-5">
+            <form class="needs-validation" method="post" novalidate>
+                {{ form.hidden_tag() }}
+
+                <div class="form-floating mb-3">
+                    {{ form.email }}
+                    {{ form.email.label(class_="z-0") }}
+                    <div id="floatingEmailFeedback" class="invalid-feedback"></div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <div class="form-floating">
+                            {{ form.password }}
+                            {{ form.password.label(class_="z-0") }}
+                        </div>
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword"><i class="bi bi-eye"
+                                id="passwordEyeIcon"></i></button>
+                    </div>
+                    <div id="floatingPasswordFeedback" class="invalid-feedback"></div>
+                </div>
+
+                <div>
+                    {{ form.submit }}
+                </div>
+            </form>
+        </div>
+
+        <div class="card-footer text-center p-3 mt-3">
+            Doesn't have an Account? <strong><a href="{{ url_for('auth.signup_customer') }}">Register Now</a></strong>
+        </div>
+    </div>
+</div>
+
+{% endblock body%}
+{% block scripts %}
+<script>
+    function validateEmail(form) {
+        const emailField = form.querySelector('#floatingEmail');
+        const emailFeedback = form.querySelector('#floatingEmailFeedback');
+
+        const email = emailField.value;
+        const emailPattern = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+
+        if (!emailPattern.test(email)) {
+            emailFeedback.style.display = "block";
+            emailField.setCustomValidity("Validation Failed");
+            emailFeedback.textContent = "Invalid Email Address!";
+            return;
+        }
+
+        emailFeedback.style.display = "none";
+        emailField.setCustomValidity("");
+    }
+
+
+    function validatePasswordComplexity(form) {
+        const passwordField = form.querySelector('#floatingPassword');
+        const passwordFeedback = form.querySelector('#floatingPasswordFeedback');
+        const password = passwordField.value;
+
+        const minLength = 8;
+        const maxLength = 16;
+        const numberCheck = /[0-9]/;
+        const uppercaseCheck = /[A-Z]/;
+        const lowercaseCheck = /[a-z]/;
+
+        if (password.length < minLength || password.length > maxLength) {
+            passwordFeedback.style.display = "block";
+            passwordFeedback.textContent = `Password must be between ${minLength} and ${maxLength} characters!`;
+            passwordField.setCustomValidity("Validation Failed");
+            return;
+        }
+        else if (!numberCheck.test(password)) {
+            passwordFeedback.style.display = "block";
+            passwordFeedback.textContent = "Password must contain at least 1 number!";
+            passwordField.setCustomValidity("Validation Failed");
+            return;
+        }
+        else if (!uppercaseCheck.test(password)) {
+            passwordFeedback.style.display = "block";
+            passwordFeedback.textContent = "Password must contain at least 1 uppercase letter!";
+            passwordField.setCustomValidity("Validation Failed");
+            return;
+        }
+        else if (!lowercaseCheck.test(password)) {
+            passwordFeedback.style.display = "block";
+            passwordFeedback.textContent = "Password must contain at least 1 lowercase letter!";
+            passwordField.setCustomValidity("Validation Failed");
+            return;
+        }
+
+        passwordFeedback.style.display = "none";
+        passwordField.setCustomValidity("");
+    }
+
+
+    const forms = document.querySelectorAll('.needs-validation')
+    Array.from(forms).forEach(form => {
+        const togglePasswordButton = document.getElementById('togglePassword');
+        const passwordField = document.getElementById('floatingPassword');
+        if (passwordField.type === 'text') {
+            togglePasswordButton.click();
+        }
+
+        form.addEventListener('submit', event => {
+            validateEmail(form);
+            validatePasswordComplexity(form);
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+
+    document.getElementById('togglePassword').addEventListener('click', () => {
+        const passwordField = document.getElementById('floatingPassword');
+        const eyeIcon = document.getElementById('passwordEyeIcon');
+
+        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', type);
+
+        eyeIcon.classList.toggle('bi-eye');
+        eyeIcon.classList.toggle('bi-eye-slash');
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const messages = [];
+        // {% for field, errors in form.errors.items() %}
+        // {% for error in errors %}
+        messages.push(`{{ field }}: {{ error }}`)
+        // {% endfor %}
+        // {% endfor %}
+        if (messages.length > 0) {
+            messages.forEach(message => {
+                showToast(message);
+            });
+        }
+
+
+        const main = document.querySelector('main');
+        main.classList.add('bg-secondary');
+    });
+</script>
+{% endblock scripts %}

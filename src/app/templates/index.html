@@ -1,0 +1,182 @@
+{% extends 'base.html' %} {% block head %}
+<title>Home</title>
+{% endblock head %} {% block body %}
+<div class="d-flex align-items-center justify-content-center hero bg-dark bg-gradient vh-100">
+    <div class="px-4 py-5 my-5 text-center">
+        <h1 class="display-5 fw-bold text-light">HomePoint</h1>
+        <h4 class="fw-normal text-light">Your Home, Our Priority</h4>
+        <div class="col-lg-6 mx-auto">
+            <p class="lead mb-4 text-light">
+                From cleaning to repairs, we handle it all with care and
+                professionalism. Your home’s needs are our priority.
+            </p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <button type="button" class="btn btn-warning btn-lg px-4 gap-3 rounded-pill border-2" id="hero-button1">
+                    Book Service
+                </button>
+                <button type="button" class="btn btn-outline-light btn-lg px-4 rounded-pill border-2" id="hero-button2">
+                    Register as Professional
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container px-4 py-5 my-5" id="hanging-icons">
+    <h4 class="pb-2">Features</h4>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-5 card-group">
+        <div class="col">
+            <div class="card h-100 shadow">
+                <div class="card-img-top bg-dark d-flex justify-content-center align-items-center">
+                    <div class="card-img-content">
+                        <img src="{{ url_for('static', filename='img/book.svg') }}" alt="Book Service Image" width="60"
+                            height="60" class="card-image" />
+                    </div>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">Easy Booking</h5>
+                    <p class="card-text">
+                        User-friendly interface to book services quickly and conveniently
+                        featuring real-time availability, instant booking confirmations, and
+                        service customization options.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow">
+                <div class="card-img-top bg-dark d-flex justify-content-center align-items-center">
+                    <div class="card-img-content">
+                        <img src="{{ url_for('static', filename='img/stars.svg') }}" alt="Reviews & Ratings Image"
+                            width="60" height="60" class="card-image" />
+                    </div>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">Reviews & Ratings</h5>
+                    <p class="card-text">
+                        Service professionals can rely on customer feedback to build their
+                        reputation. An integrated review and rating system helps them
+                        showcase their skills and attract more clients.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 shadow">
+                <div class="card-img-top bg-dark d-flex justify-content-center align-items-center">
+                    <div class="card-img-content">
+                        <img src="{{ url_for('static', filename='img/geo-alt.svg') }}" alt="Tracking Image" width="60"
+                            height="60" class="card-image" />
+                    </div>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title">Service Updates</h5>
+                    <p class="card-text">
+                        Customers can see real-time updates on the status of their service
+                        requests through GPS tracking, progress notifications, and ETA.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container px-4 py-5 my-5">
+    <div id="myCarousel" class="carousel slide container bg-dark p-0 m-0 shadow-lg" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0" class="active" aria-current="true"
+                aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <div class="h-100 w-100">
+                    <img src="{{ url_for('static', filename='img/carousel_image_1.jpg') }}" alt="Carousel Image"
+                        class="carousel-image">
+                </div>
+                <div class="container">
+                    <div class="carousel-caption shadow p-4 bg-dark text-light bg-opacity-50 rounded-5">
+                        <h3>Deep Cleaning & Pest Control</h3>
+                        <p class="m-0">
+                            Our service professionals offer a wide range of services including deep cleaning and pest
+                            control.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="carousel-item">
+                <div class="h-100 w-100">
+                    <img src="{{ url_for('static', filename='img/carousel_image_2.jpg') }}" alt="Carousel Image"
+                        class="carousel-image">
+                </div>
+                <div class="container">
+                    <div class="carousel-caption text-start shadow p-4 bg-dark text-light bg-opacity-50 rounded-5">
+                        <h3>Taking care of Old & Kids</h3>
+                        <p class="m-0">
+                            We provide well trained professionals to take care of your dear ones when you are not home.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="carousel-item">
+                <div class="h-100 w-100">
+                    <img src="{{ url_for('static', filename='img/carousel_image_3.jpg') }}" alt="Carousel Image"
+                        class="carousel-image">
+                </div>
+                <div class="container">
+                    <div class="carousel-caption text-end shadow p-4 bg-dark text-light bg-opacity-50 rounded-5">
+                        <h3>Electrical & Plumbing Services</h3>
+                        <p class="m-0">
+                            Our skilled professionals can handle any electrical & plumbing work with ease.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#myCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+
+
+<div class="container px-4 py-5 mt-5">
+    <div class="position-relative p-5 text-center text-muted bg-body border border-dashed rounded-5 shadow-lg">
+        <h3 class="text-body-emphasis mt-5">Experience HomePoint</h3>
+        <p class="col-lg-6 mx-auto mb-4">
+            What are you waiting for? Register now and get access to a wide range of services.
+        </p>
+        <a class="btn btn-primary px-5 mb-2" href="{{ url_for('user.dashboard') }}">
+            Register Now
+        </a>
+    </div>
+</div>
+{% endblock body %}
+
+{% block scripts %}
+<script>
+    const hero = document.getElementById("hero");
+    const navbarHeight = document.querySelector("nav").offsetHeight;
+    // hero.style.height = `${window.innerHeight - navbarHeight + 8}px`;
+
+    const heroButton1 = document.getElementById("hero-button1");
+    heroButton1.addEventListener("click", () => {
+        window.location.href = "{{ url_for('customer.dashboard') }}";
+    });
+
+    const heroButton2 = document.getElementById("hero-button2");
+    heroButton2.addEventListener("click", () => {
+        window.location.href = "{{ url_for('auth.signup_professional') }}";
+    });
+</script>
+{% endblock scripts %}

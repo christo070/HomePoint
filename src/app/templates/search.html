@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Search</title>
+{% endblock head %}
+
+{% block body %}
+<div class="container">
+    <div class="d-flex justify-content-end my-5">
+        <form>
+            <div class="row">
+                <div class="input-group col-sm mb-2 mb-sm-0">
+                    <label class="input-group-text shadow" for="search_by">Search By</label>
+                    <select class="form-select shadow" id="search_by" name="search_by">
+                        {% for option in options %}
+                        <option value="{{ option }}">{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="input-group col-sm">
+                    <input type="text" class="form-control shadow" name="search_text" placeholder="Search"
+                        aria-label="Search" aria-describedby="button-addon2">
+                    <button class="btn btn-success shadow" type="button" id="button-addon2"
+                        onclick="fetchResult()"><strong><i class="bi bi-search"></i></strong></button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="search-result">
+        <!-- Search result will be displayed here -->
+    </div>
+</div>
+{% endblock body %}
+
+{% block scripts %}
+<script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("search_by").selectedIndex = 0;
+    });
+
+    document.addEventListener("change", () => {
+        const user_role = "{{ role }}";
+        const search_by = document.getElementById("search_by").value;
+        if (user_role == 'professional' && search_by === "Date") {
+            document.querySelector("input[name='search_text']").setAttribute("type", "date");
+        }
+        else {
+            document.querySelector("input[name='search_text']").setAttribute("placeholder", "Search");
+            document.querySelector("input[name='search_text']").setAttribute("type", "text");
+        }
+    });
+
+    async function fetchResult() {
+        try {
+            const search_by = document.getElementById("search_by").value;
+            const search_text = document.querySelector("input[name='search_text']").value;
+            const user_role = "{{ role }}";
+
+            const response = await fetch("{{ fetch_url }}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({
+                    "search_by": search_by,
+                    "search_text": search_text
+                })
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+
+            const searchResult = document.querySelector(".search-result");
+            searchResult.innerHTML = "";
+
+            if (data["data"].length === 0) {
+                searchResult.innerHTML = "<h4>No result found</h4>";
+            }
+            else {
+                if (user_role === 'admin') {
+                    if (search_by === 'Customer') {
+                        showAdminSearchByCustomers(data["data"]);
+                    }
+                    else if (search_by === 'Service Professional') {
+                        showAdminSearchByProfessionals(data["data"]);
+                    }
+                    else if (search_by === 'Service Request') {
+                        showAdminSearchByServiceRequests(data["data"]);
+                    }
+                }
+                else if (user_role === 'professional') {
+                    showProfessionalSearchResults(data["data"]);
+                }
+                else if (user_role === 'customer') {
+                    showCustomerSearchResults(data["data"]);
+                }
+                else {
+                    searchResult.innerHTML = "<h4>Invalid search option</h4>";
+                }
+            }
+        }
+        catch (error) {
+            console.error("ERROR: ", error);
+            searchResult.innerHTML = "<h4>Error fetching data, Please try again later</h4>";
+        }
+    }
+
+    function showAdminSearchByCustomers(customers) {
+        const searchResult = document.querySelector(".search-result");
+        search_by = document.getElementById("search_by").value;
+        search_text = document.querySelector("input[name='search_text']").value;
+
+        searchResult.innerHTML = `
+        <div class="table-responsive card p-4 my-5 shadow-lg">
+            <table class="table caption-top align-middle table-hover mb-2">
+                <caption>
+                    <h5>Search Results</h5>
+                </caption>
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Phone</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${customers.map(customer => `
+                        <tr>
+                            <td><a href="{{ url_for('admin.get_user_details') }}?id=${customer.id}">${customer.id}</a></td>
+                            <td>${customer.name}</td>
+                            <td>${customer.email}</td>
+                            <td>${customer.phone}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+        `;
+    }
+
+    function showAdminSearchByProfessionals(professionals) {
+        const searchResult = document.querySelector(".search-result");
+        search_by = document.getElementById("search_by").value;
+        search_text = document.querySelector("input[name='search_text']").value;
+
+        searchResult.innerHTML = `
+        <div class="table-responsive card p-4 my-5 shadow-lg">
+            <table class="table caption-top align-middle table-hover mb-2">
+                <caption>
+                    <h5>Search Results</h5>
+                </caption>
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Phone</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${professionals.map(professional => `
+                        <tr>
+                            <td><a href="{{ url_for('admin.get_user_details') }}?id=${professional.id}">${professional.id}</a></td>
+                            <td>${professional.name}</td>
+                            <td>${professional.email}</td>
+                            <td>${professional.phone}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+        `;
+    }
+
+    function showAdminSearchByServiceRequests(service_requests) {
+        const searchResult = document.querySelector(".search-result");
+        search_by = document.getElementById("search_by").value;
+        search_text = document.querySelector("input[name='search_text']").value;
+
+        searchResult.innerHTML = `
+        <div class="table-responsive card p-4 my-5 shadow-lg">
+            <table class="table caption-top align-middle table-hover mb-2">
+                <caption>
+                    <h5>Search Results</h5>
+                </caption>
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Customer</th>
+                        <th scope="col">Professional</th>
+                        <th scope="col">Service</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Date Requested</th>
+                        <th scope="col">Date Accepted</th>
+                        <th scope="col">Date Completed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${service_requests.map(service_request => `
+                        <tr>
+                            <td><a href="{{ url_for('admin.get_service_request_details') }}?id=${service_request.id}">${service_request.id}</a></td>
+                            <td>${service_request.customer}</td>
+                            <td>${service_request.professional}</td>
+                            <td>${service_request.service}</td>
+                            <td>${service_request.status}</td>
+                            <td>${service_request.date_requested}</td>
+                            <td>${service_request.date_accepted}</td>
+                            <td>${service_request.date_completed}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+        `;
+    }
+
+    function showProfessionalSearchResults(service_requests) {
+        const searchResult = document.querySelector(".search-result");
+        search_by = document.getElementById("search_by").value;
+        search_text = document.querySelector("input[name='search_text']").value;
+
+        searchResult.innerHTML = `
+        <div class="table-responsive card p-4 my-5 shadow-lg">
+            <table class="table caption-top align-middle table-hover mb-2">
+                <caption>
+                    <h5>Search Results</h5>
+                </caption>
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Customer</th>
+                        <th scope="col">Phone</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Address</th>
+                        <th scope="col">Pincode</th>
+
+                        <th scope="col">Status</th>
+                        <th scope="col">Date Requested</th>
+                        <th scope="col">Date Accepted</th>
+                        <th scope="col">Date Completed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${service_requests.map(service_request => `
+                        <tr>
+                            <td><a href="{{ url_for('professional.get_service_request_details') }}?id=${service_request.id}">${service_request.id}</a></td>
+                            <td>${service_request.customer}</td>
+                            <td>${service_request.phone}</td>
+                            <td>${service_request.email}</td>
+                            <td>${service_request.address}</td>
+                            <td>${service_request.pincode}</td>
+
+                            <td>${service_request.status}</td>
+                            <td>${service_request.date_requested}</td>
+                            <td>${service_request.date_accepted}</td>
+                            <td>${service_request.date_completed}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+        `;
+    }
+
+    function showCustomerSearchResults(packages) {
+        const searchResult = document.querySelector(".search-result");
+        search_by = document.getElementById("search_by").value;
+        search_text = document.querySelector("input[name='search_text']").value;
+
+        searchResult.innerHTML = `
+        <div class="table-responsive card p-4 my-5 shadow-lg">
+            <table class="table caption-top align-middle table-hover mb-2">
+                <caption>
+                    <h5>Search Results</h5>
+                </caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Service Name</th>
+                        <th scope="col">Base Price</th>
+                        <th scope="col">Completion Time</th>
+                        <th scope="col">Service Professional Name</th>
+                        <th scope="col">Experience (in Years)</th>
+                        <th scope="col">Location</th>
+                        <th scope="col">Pincode</th>
+                        <th scope="col">Average Rating (in 5.0)</th>
+                        <th scope="col">Total Reviews</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${packages.map(package => `
+                        <tr>
+                            <td>${package.service_name}</td>
+                            <td>${package.base_price}</td>
+                            <td>${package.completion_time}</td>
+                            <td>${package.professional_name}</td>
+                            <td>${package.professional_experience}</td>
+                            <td>${package.professional_location}</td>
+                            <td>${package.professional_pincode}</td>
+                            <td>${package.professional_average_rating}</td>
+                            <td>${package.professional_tot_reviews}</td>
+                            <td>
+                                <form>
+                                    <button class="btn btn-primary" title="Book Package" type="submit" formmethod="post" formaction="{{ url_for('customer.book_package') }}?id=${package.id}">Book</button>
+                                </form>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+        `;
+    }
+</script>
+{% endblock scripts %}

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}" type="image/x-icon">
+        <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-5.3.3/css/bootstrap.min.css') }}">
+        <link rel="stylesheet"
+            href="{{ url_for('static', filename='bootstrap-icons-1.11.3/font/bootstrap-icons.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+        {% block head %}
+        <title>HomePoint</title>
+        {% endblock head %}
+    </head>
+
+    <body>
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-lg"
+                aria-label="Offcanvas navbar large">
+                <div class="container container-fluid">
+                    <a class="navbar-brand" href="{{ url_for('main.index') }}">
+                        <div class="logo">
+                            <div class="circle">
+                                <img src="{{ url_for('static', filename='img/house.svg') }}" alt="Logo"
+                                    class="circle-image">
+                            </div>
+                        </div>
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasNavbar2" aria-controls="offcanvasNavbar2"
+                        aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="offcanvas offcanvas-end text-bg-dark" tabindex="-1" id="offcanvasNavbar2"
+                        aria-labelledby="offcanvasNavbar2Label">
+                        <div class="offcanvas-header">
+                            <h5 class="offcanvas-title" id="offcanvasNavbar2Label">HomePoint</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body d-flex">
+                            <ul class="navbar-nav flex-grow-1 pe-3">
+                                {% if current_user.is_authenticated %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for('user.dashboard') }}">Dashboard</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for('user.search' ) }}">Search</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ url_for('user.summary' ) }}">Summary</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                            <div class="nav-section-2">
+                                {% if current_user.is_authenticated %}
+                                <ul class="navbar-nav">
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle p-1" href="#" role="button"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            <img src="{{ url_for('static', filename='img/person.svg') }}"
+                                                alt="Profile Pic" width="30" height="30" class="user-logo">
+                                            &nbsp;User
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item"
+                                                    href="{{ url_for('user.profile') }}">Profile</a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                    href="{{ url_for('user.messages') }}">Messages</a>
+                                            </li>
+                                            <li>
+                                                <hr class="dropdown-divider">
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                {% else %}
+                                <div class="mt-auto">
+                                    <form>
+                                        <button type="submit" class="btn btn-outline-light rounded-pill border-2"
+                                            formaction="{{ url_for('auth.login') }}" formmethod="get"
+                                            id="loginButton">Login</button>
+                                        <button type="submit"
+                                            class="btn btn-light rounded-pill border-2 btn-hover-warning"
+                                            formaction="{{ url_for('auth.signup_customer') }}" formmethod="get"
+                                            id="registerButton">Register</button>
+                                    </form>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main class="py-5">
+            <!-- Bootstrap Toast -->
+            <div aria-live="polite" aria-atomic="true" class="d-flex justify-content-center">
+                <div class="toast-container z-1 top-0 start-50 translate-middle-x p-3" id="toastContainer">
+                </div>
+            </div>
+
+            <!-- Bootstrap Modal -->
+            <div class="modal modal-sheet fade p-4 py-md-5" tabindex="-1" role="dialog" id="modalChoice"
+                aria-labelledby="modalTitle" data-bs-backdrop="static" data-bs-keyboard="false" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content rounded-3 shadow">
+                        <div class="modal-body p-4 text-center">
+                            <h5 class="mb-0" id="modalTitle">Modal Title</h5>
+                            <p class="mb-0" id="modalDescription">Modal Description</p>
+                        </div>
+                        <div class="modal-footer flex-nowrap p-0">
+                            <button type="button"
+                                class="btn btn-lg btn-link fs-6 text-decoration-none col-6 py-3 m-0 rounded-0 border-end"
+                                data-bs-dismiss="modal" id="cancelText">Cancel</button>
+                            <button type="button"
+                                class="btn btn-lg btn-link fs-6 text-decoration-none col-6 py-3 m-0 rounded-0"
+                                id="modalAction">Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% block body %}
+            {% endblock body %}
+        </main>
+
+        <footer class="bg-dark text-bg-dark shadow-lg" data-bs-theme="dark">
+            <div class="container flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+                <div class="col-md-4 d-flex align-items-center">
+                    <span class="mb-3 me-2 mb-md-0 text-body-secondary text-decoration-none lh-1"></span>
+                    <span class="mb-3 mb-md-0 text-body-secondary">&copy; 2024 HomePoint, Inc</span>
+                </div>
+            </div>
+        </footer>
+        <script src="{{ url_for('static', filename='bootstrap-5.3.3/js/bootstrap.bundle.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='chart.js-4.4.6/chart.umd.js') }}"></script>
+        <script>
+            // Bootstrap Modal implementation for Confirmation Dialog
+            function showModal(title, description, actionText, cancelText, action) {
+                const modal = new bootstrap.Modal(document.getElementById('modalChoice'), {
+                    keyboard: false
+                });
+                const modalTitle = document.getElementById('modalTitle');
+                const modalBody = document.getElementById('modalDescription');
+                const modalActionButton = document.getElementById('modalAction');
+                const cancelActionButton = document.getElementById('cancelText');
+                modalTitle.textContent = title;
+                modalBody.textContent = description;
+                modalActionButton.innerHTML = `${actionText}`;
+                cancelActionButton.innerHTML = `${cancelText}`;
+                modalActionButton.addEventListener('click', action);
+                modal.show();
+            }
+
+            // Bootstrap Toast implementation for Server Notification
+            function clearAllToast() {
+                const toastContainer = document.getElementById('toastContainer');
+                const toasts = toastContainer.querySelectorAll('.toast');
+                toasts.forEach(toast => {
+                    const bootstrapToast = bootstrap.Toast.getOrCreateInstance(toast);
+                    bootstrapToast.hide();
+                    toast.remove();
+                });
+            }
+
+            function showToast(message) {
+                const newToast = document.createElement('div');
+                newToast.className = 'toast shadow-lg z-3';
+                newToast.setAttribute('role', 'status'); // 'status', 'alert'
+                newToast.setAttribute('aria-live', 'polite'); // 'polite', 'assertive'
+                newToast.setAttribute('aria-atomic', 'true');
+                newToast.setAttribute('data-bs-delay', '2000');
+                newToast.setAttribute('data-bs-autohide', 'true');
+                newToast.innerHTML = `
+                    <div class="toast-header">
+                        <strong class="me-auto">Notification</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">${message}</div>
+                `;
+
+                const toastContainer = document.getElementById('toastContainer');
+                toastContainer.appendChild(newToast);
+
+                const toast = bootstrap.Toast.getOrCreateInstance(newToast);
+                toast.show();
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const main = document.querySelector("main");
+                const navbarHeight = document.querySelector("nav").offsetHeight;
+                main.style.paddingTop = `${navbarHeight - 1}px`;
+
+                const offcanvas = document.querySelector(".offcanvas");
+                const offcanvas_body = document.querySelector(".offcanvas-body");
+
+                const loginButton = document.getElementById("loginButton");
+                const registerButton = document.getElementById("registerButton");
+
+                offcanvas.addEventListener('show.bs.offcanvas', () => {
+                    offcanvas_body.classList.add('flex-column');
+
+                    if ((loginButton !== null) && (registerButton !== null)) {
+                        loginButton.classList.add('auth-button');
+                        registerButton.classList.add('auth-button');
+                    }
+                });
+
+                offcanvas.addEventListener('hidden.bs.offcanvas', () => {
+                    offcanvas_body.classList.remove('flex-column');
+
+                    if ((loginButton !== null) && (registerButton !== null)) {
+                        loginButton.classList.remove('auth-button');
+                        registerButton.classList.remove('auth-button');
+                    }
+                });
+
+                // Get Flash Messages from Flask Backend and show as Bootstrap Toast
+                const flashMessages = JSON.parse(`{{ get_flashed_messages() | tojson }}`);
+                if (flashMessages.length > 0) {
+                    flashMessages.forEach(message => {
+                        showToast(message);
+                    });
+                }
+            });
+
+            document.addEventListener('click', (event) => {
+                if (event.target.tagName === 'A' || event.target.tagName === 'INPUT' || event.target.tagName === 'FORM' || event.target.querySelector('.navbar-toggler')) {
+                    clearAllToast();
+                }
+            });
+        </script>
+        {% block scripts %}
+        {% endblock scripts %}
+    </body>
+
+</html>
