@@ -32,7 +32,13 @@
     db.create_all()
     ```
 
-## App Demo
+## App Demonstration
+
+
+https://github.com/user-attachments/assets/6f93c7f0-8076-47a0-8f54-d94e1e1a4d7d
+
+
+
 
 
 # References
