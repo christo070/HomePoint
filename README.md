@@ -37,8 +37,7 @@
 
 https://github.com/user-attachments/assets/6f93c7f0-8076-47a0-8f54-d94e1e1a4d7d
 
-
-
+Link for video -> [HomePoint Demonstration](https://youtu.be/7uARFWCOVhM)
 
 
 # References
