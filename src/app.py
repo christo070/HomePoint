@@ -1,8 +1,6 @@
 """
-The configuration file will be used only if `run.py` is executed by
-    $ python3 run.py
-not by
-    $ flask run
+Created by : Christo Sojan
+Date       : 2024-12-20
 """
 
 from app import create_app
