@@ -2,7 +2,7 @@
 ## Running the application
 - The configuration file will be used only if `app.py` is executed by
     ```shell
-    python3 run.py
+    python3 app.py
     ```
     not by
     ```shell
